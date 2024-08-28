@@ -4,6 +4,8 @@ import { DatabaseModule } from './database/database.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ObjectionModule } from 'nestjs-objection/dist';
 import { AuthModule } from './auth/auth.module';
+import { JwtConfigModule } from './third-party/jwt/jwt.module';
+import { AppConfigModule } from './third-party/config/config.module';
 
 @Module({
   imports: [
@@ -23,9 +25,7 @@ import { AuthModule } from './auth/auth.module';
               host: configService.get<string>('DATABASE_HOST'),
               port: configService.get<number>('DATABASE_PORT'),
               user: configService.get<string>('DATABASE_USER'),
-
-              // password: configService.get<string>('DATABASE_PASSWORD'),
-              password: '12345678',
+              password: configService.get<string>('DATABASE_PASSWORD'),
               database: configService.get<string>('DATABASE_NAME'),
             },
           },
@@ -36,7 +36,16 @@ import { AuthModule } from './auth/auth.module';
     UsersModule,
     DatabaseModule,
     AuthModule,
+    JwtConfigModule,
+    AppConfigModule,
   ],
   controllers: [],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(configService: ConfigService) {
+    console.log(
+      'JWT_SECRET (AppModule):',
+      configService.get<string>('JWT_SECRET'),
+    );
+  }
+}
