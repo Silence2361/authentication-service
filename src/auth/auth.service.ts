@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -7,6 +8,7 @@ import {
 import { UsersRepository } from 'src/database/users/user.repository';
 import * as bcrypt from 'bcrypt';
 import {
+  IChangePassword,
   ILogin,
   ILoginResponse,
   IRegister,
@@ -63,5 +65,44 @@ export class AuthService {
     const accessToken = await this.jwtService.signAsync(payload);
 
     return { accessToken };
+  }
+
+  async changePassword(
+    userId: number,
+    credentials: IChangePassword,
+  ): Promise<void> {
+    const { currentPassword, newPassword, confirmNewPassword } = credentials;
+
+    if (newPassword !== confirmNewPassword) {
+      throw new BadRequestException('New password do not match');
+    }
+
+    const user = await this.usersRespository.findUserById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const isCorrectPassword = await bcrypt.compare(
+      currentPassword,
+      user.password,
+    );
+
+    if (!isCorrectPassword) {
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+
+    const isSamePassword = await bcrypt.compare(newPassword, user.password);
+    if (isSamePassword) {
+      throw new BadRequestException(
+        'New password cannot be the same as the current password',
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await this.usersRespository.updateUserById(userId, {
+      password: hashedPassword,
+    });
   }
 }

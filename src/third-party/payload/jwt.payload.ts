@@ -1,5 +1,5 @@
 export interface JwtPayload {
-  userId: number;
+  id: number;
 }
 
 export interface IValidateUser {
