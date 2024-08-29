@@ -2,11 +2,15 @@ export interface IUser {
   id: number;
   email: string;
   password: string;
+  secretQuestion: string;
+  secretAnswer: string;
 }
 
 export interface ICreateUser {
   email: string;
   password: string;
+  secretQuestion?: string;
+  secretAnswer?: string;
 }
 
 export interface IUpdateUser {

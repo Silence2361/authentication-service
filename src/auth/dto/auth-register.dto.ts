@@ -8,4 +8,10 @@ export class AuthRegisterDto {
   @IsNotEmpty()
   @IsString()
   password: string;
+
+  @IsString()
+  secretQuestion: string;
+
+  @IsString()
+  secretAnswer: string;
 }

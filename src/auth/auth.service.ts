@@ -9,10 +9,13 @@ import { UsersRepository } from 'src/database/users/user.repository';
 import * as bcrypt from 'bcrypt';
 import {
   IChangePassword,
+  IGetSecretQuestion,
+  IGetSecretQuestionResponse,
   ILogin,
   ILoginResponse,
   IRegister,
   IRegisterResponse,
+  IResetPassword,
 } from 'src/database/auth/auth.interface';
 import { JwtService } from '@nestjs/jwt';
 
@@ -24,7 +27,7 @@ export class AuthService {
   ) {}
 
   async register(credentials: IRegister): Promise<IRegisterResponse> {
-    const { email, password } = credentials;
+    const { email, password, secretAnswer, secretQuestion } = credentials;
 
     const candidate = await this.usersRespository.findUserByEmail(email);
 
@@ -33,10 +36,13 @@ export class AuthService {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedSecretAnswer = await bcrypt.hash(secretAnswer, 10);
 
     const user = await this.usersRespository.createUser({
       email,
       password: hashedPassword,
+      secretQuestion,
+      secretAnswer: hashedSecretAnswer,
     });
 
     return {
@@ -102,6 +108,58 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     await this.usersRespository.updateUserById(userId, {
+      password: hashedPassword,
+    });
+  }
+
+  async getSecretQuestion(
+    getSecretQuestion: IGetSecretQuestion,
+  ): Promise<IGetSecretQuestionResponse> {
+    const { email } = getSecretQuestion;
+
+    const user = await this.usersRespository.findUserByEmail(email);
+
+    if (!user || !user.secretQuestion) {
+      throw new NotFoundException('User not found or secret question not set');
+    }
+
+    return { secretQuestion: user.secretQuestion };
+  }
+
+  async resetPassword(resetPassword: IResetPassword): Promise<void> {
+    const { email, secretAnswer, newPassword, confirmNewPassword } =
+      resetPassword;
+
+    if (newPassword !== confirmNewPassword) {
+      throw new BadRequestException('New passwords do not match');
+    }
+
+    const user = await this.usersRespository.findUserByEmail(email);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (!user.secretAnswer) {
+      throw new BadRequestException('Secret answer is not set for this user');
+    }
+
+    if (!secretAnswer) {
+      throw new BadRequestException('Secret answer is required');
+    }
+
+    const isCorrectAnswer = await bcrypt.compare(
+      secretAnswer,
+      user.secretAnswer,
+    );
+
+    if (!isCorrectAnswer) {
+      throw new UnauthorizedException('Secret answer is incorrect');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await this.usersRespository.updateUserById(user.id, {
       password: hashedPassword,
     });
   }
