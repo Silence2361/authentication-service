@@ -6,6 +6,9 @@ import { ObjectionModule } from 'nestjs-objection/dist';
 import { AuthModule } from './auth/auth.module';
 import { JwtConfigModule } from './third-party/jwt/jwt.module';
 import { AppConfigModule } from './third-party/config/config.module';
+import { ApplicationService } from './application/application.service';
+import { ApplicationController } from './application/application.controller';
+import { ApplicationModule } from './application/application.module';
 
 @Module({
   imports: [
@@ -38,14 +41,13 @@ import { AppConfigModule } from './third-party/config/config.module';
     AuthModule,
     JwtConfigModule,
     AppConfigModule,
+    ApplicationModule,
   ],
-  controllers: [],
+  controllers: [ApplicationController],
+  providers: [ApplicationService],
 })
 export class AppModule {
   constructor(configService: ConfigService) {
-    console.log(
-      'JWT_SECRET (AppModule):',
-      configService.get<string>('JWT_SECRET'),
-    );
+    configService.get<string>('JWT_SECRET');
   }
 }
