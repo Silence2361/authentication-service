@@ -1,6 +1,7 @@
 import { UserRole } from 'src/database/roles/roles.enum/roles.enum';
 
-export class AuthRegisterResponseDto {
+export class FindRoleByIdResponseDto {
   id: number;
-  email: string;
+  name: UserRole;
+  applicationId: number;
 }

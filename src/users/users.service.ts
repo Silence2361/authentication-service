@@ -15,13 +15,14 @@ import {
 } from 'src/database/users/user.interface';
 import { UsersRepository } from 'src/database/users/user.repository';
 import * as bcrypt from 'bcrypt';
+import { UserRole } from 'src/database/roles/roles.enum/roles.enum';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
 
   async createUser(params: ICreateUser): Promise<ICreateUserResponse> {
-    const { email, password } = params;
+    const { email, password, roleId } = params;
 
     const existingUser = await this.usersRepository.findUserByEmail(email);
 
@@ -34,6 +35,7 @@ export class UsersService {
     const user: IUser = await this.usersRepository.createUser({
       email,
       password: hashedPassword,
+      roleId,
     });
 
     return { id: user.id };
@@ -45,6 +47,7 @@ export class UsersService {
     return users.map((user) => ({
       id: user.id,
       email: user.email,
+      roleId: user.roleId,
     }));
   }
 
@@ -60,11 +63,12 @@ export class UsersService {
     return {
       id: user.id,
       email: user.email,
+      roleId: user.roleId,
     };
   }
 
   async updateUserById(userId: number, params: IUpdateUserById): Promise<void> {
-    const { email, password } = params;
+    const { email, password, roleId } = params;
 
     const user: IUser | null = await this.usersRepository.findUserById(userId);
 
@@ -81,6 +85,7 @@ export class UsersService {
     const updateUserData = {
       email,
       password: hashedPassword || password,
+      roleId,
     };
 
     await this.usersRepository.updateUserById(userId, updateUserData);

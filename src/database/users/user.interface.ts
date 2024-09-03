@@ -1,7 +1,10 @@
+import { Role } from '../roles/roles.model';
+
 export interface IUser {
   id: number;
   email: string;
   password: string;
+  roleId: number;
   secretQuestion: string;
   secretAnswer: string;
 }
@@ -9,6 +12,7 @@ export interface IUser {
 export interface ICreateUser {
   email: string;
   password: string;
+  roleId: number;
   secretQuestion?: string;
   secretAnswer?: string;
 }
@@ -16,6 +20,7 @@ export interface ICreateUser {
 export interface IUpdateUser {
   email?: string;
   password?: string;
+  roleId?: number;
 }
 
 export interface ICreateUserResponse {
@@ -25,6 +30,7 @@ export interface ICreateUserResponse {
 export interface IFindAllUsersResponse {
   id: number;
   email: string;
+  roleId: number;
 }
 
 export interface IFindUserById {
@@ -34,11 +40,13 @@ export interface IFindUserById {
 export interface IFindUserByIdResponse {
   id: number;
   email: string;
+  roleId: number;
 }
 
 export interface IUpdateUserById {
   email?: string;
   password?: string;
+  roleId?: number;
 }
 
 export interface IDeleteUserById {

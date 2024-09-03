@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 export class AuthRegisterDto {
   @IsEmail()
@@ -8,6 +8,10 @@ export class AuthRegisterDto {
   @IsNotEmpty()
   @IsString()
   password: string;
+
+  @IsNotEmpty()
+  @IsInt()
+  roleId: number;
 
   @IsString()
   secretQuestion: string;

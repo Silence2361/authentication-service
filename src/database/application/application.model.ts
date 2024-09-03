@@ -1,4 +1,6 @@
 import { Model } from 'objection';
+import { Role } from '../roles/roles.model';
+import { User } from '../users/users.model';
 
 export class Application extends Model {
   static tableName = 'applications';
@@ -26,4 +28,34 @@ export class Application extends Model {
       },
     };
   }
+  static relationMappings = {
+    roles: {
+      relation: Model.HasManyRelation,
+      modelClass: Role,
+      join: {
+        from: 'applications.id',
+        to: 'roles.applicationId',
+      },
+    },
+    owner: {
+      relation: Model.BelongsToOneRelation,
+      modelClass: User,
+      join: {
+        from: 'applications.ownerId',
+        to: 'users.id',
+      },
+    },
+    users: {
+      relation: Model.ManyToManyRelation,
+      modelClass: User,
+      join: {
+        from: 'applications.id',
+        through: {
+          from: 'userRoles.applicationId',
+          to: 'userRoles.userId',
+        },
+        to: 'users.id',
+      },
+    },
+  };
 }

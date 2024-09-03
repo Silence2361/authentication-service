@@ -3,6 +3,7 @@ export interface IRegister {
   password: string;
   secretQuestion: string;
   secretAnswer: string;
+  roleId?: number;
 }
 
 export interface IRegisterResponse {

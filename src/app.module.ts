@@ -6,16 +6,14 @@ import { ObjectionModule } from 'nestjs-objection/dist';
 import { AuthModule } from './auth/auth.module';
 import { JwtConfigModule } from './third-party/jwt/jwt.module';
 import { AppConfigModule } from './third-party/config/config.module';
-import { ApplicationService } from './application/application.service';
-import { ApplicationController } from './application/application.controller';
 import { ApplicationModule } from './application/application.module';
+import { RolesModule } from './roles/roles.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      // envFilePath: `.${process.env.NODE_ENV}.env`,
-      envFilePath: '.env',
+      envFilePath: `.${process.env.NODE_ENV}.env`,
     }),
 
     ObjectionModule.forRootAsync({
@@ -42,9 +40,8 @@ import { ApplicationModule } from './application/application.module';
     JwtConfigModule,
     AppConfigModule,
     ApplicationModule,
+    RolesModule,
   ],
-  controllers: [ApplicationController],
-  providers: [ApplicationService],
 })
 export class AppModule {
   constructor(configService: ConfigService) {

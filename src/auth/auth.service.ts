@@ -18,6 +18,7 @@ import {
   IResetPassword,
 } from 'src/database/auth/auth.interface';
 import { JwtService } from '@nestjs/jwt';
+import { UserRole } from 'src/database/roles/roles.enum/roles.enum';
 
 @Injectable()
 export class AuthService {
@@ -27,7 +28,8 @@ export class AuthService {
   ) {}
 
   async register(credentials: IRegister): Promise<IRegisterResponse> {
-    const { email, password, secretAnswer, secretQuestion } = credentials;
+    const { email, password, secretAnswer, secretQuestion, roleId } =
+      credentials;
 
     const candidate = await this.usersRespository.findUserByEmail(email);
 
@@ -41,6 +43,7 @@ export class AuthService {
     const user = await this.usersRespository.createUser({
       email,
       password: hashedPassword,
+      roleId,
       secretQuestion,
       secretAnswer: hashedSecretAnswer,
     });
